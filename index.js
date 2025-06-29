@@ -1,26 +1,20 @@
-const express = require('express');
-const fetch = require('node-fetch');
-const cors = require('cors');
-require('dotenv').config();
-
+const express = require("express");
+const axios = require("axios");
 const app = express();
-app.use(cors());
 
-app.get('/api/odds', async (req, res) => {
+app.get("/api", async (req, res) => {
   try {
-    const response = await fetch('https://pinnacle-odds.p.rapidapi.com/kit/v1/meta-periods?sport_id=1', {
-      method: 'GET',
+    const response = await axios.get("https://pinnacle-odds.p.rapidapi.com/kit/v1/periods?sport_id=1", {
       headers: {
-        'x-rapidapi-host': 'pinnacle-odds.p.rapidapi.com',
-        'x-rapidapi-key': process.env.RAPIDAPI_KEY
+        "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
+        "X-RapidAPI-Host": "pinnacle-odds.p.rapidapi.com"
       }
     });
-    const data = await response.json();
-    res.json(data);
+    res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: 'API call failed', details: error.toString() });
+    console.error(error?.response?.data || error.message);
+    res.status(500).json({ error: "Proxy error" });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log('Proxy server running on port', port));
+module.exports = app;
