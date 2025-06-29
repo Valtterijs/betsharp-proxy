@@ -1,20 +1,19 @@
-const express = require("express");
-const axios = require("axios");
-const app = express();
+const fetch = require('node-fetch');
 
-app.get("/api", async (req, res) => {
+module.exports = async (req, res) => {
   try {
-    const response = await axios.get("https://pinnacle-odds.p.rapidapi.com/kit/v1/periods?sport_id=1", {
+    const response = await fetch('https://pinnacle-odds.p.rapidapi.com/kit/v1/meta-periods?sport_id=1', {
+      method: 'GET',
       headers: {
-        "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
-        "X-RapidAPI-Host": "pinnacle-odds.p.rapidapi.com"
+        'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+        'X-RapidAPI-Host': 'pinnacle-odds.p.rapidapi.com'
       }
     });
-    res.json(response.data);
-  } catch (error) {
-    console.error(error?.response?.data || error.message);
-    res.status(500).json({ error: "Proxy error" });
-  }
-});
 
-module.exports = app;
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
